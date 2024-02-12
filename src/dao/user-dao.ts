@@ -3,8 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { UserDao } from './user-dao.interface';
 import { isUserExist } from './user-dao.validators';
 
+const users = new Map<string, User>();
 export const userDao = (): UserDao => {
-  const users = new Map<string, User>();
+
   return {
     get: async () => {
       return Array.from(users.values()) as User[];
