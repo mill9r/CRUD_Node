@@ -11,8 +11,6 @@ const port = process.env.PORT || 3000;
 const server = createServer();
 
 
-
-// Listen to the request event
 server.on('request', (request: IncomingMessage, response: ServerResponse) => {
   if (!httpUserRequestEndpointHandler(request.method, request.url)) {
     handleNotFoundEndpoint(response);
