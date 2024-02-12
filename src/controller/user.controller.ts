@@ -1,39 +1,51 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { UserService } from "../services/user-service.interface";
+import { UserService } from '../services/user-service.interface';
+import { URL_MATCHER } from '../constants/api-routes.constant';
+import { HttpMethod } from '../constants/http.enum';
+import { ServiceUuidIsInvalidException } from '../exceptions/service-exceptions';
+import { createChain, handle400Request, handle404Request } from "../utils/http-request-handler";
 
-export const userController = (service: UserService) => {
-  return {
-    get: async (res: ServerResponse) => {
-      const users = await service.get();
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify(users));
-    },
-    getById: async (res: ServerResponse, id: string) => {
-      const user = await service.getById(id);
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify(user));
-    },
-    create: async (res: ServerResponse, body: string) => {
-      const user = await service.create(body);
-      res.statusCode = 201;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify(user));
-    },
-    update: async (res: ServerResponse, id: string, body: string) => {
-      const user = await service.update(id, body);
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify(user));
-    },
-    delete: async (res: ServerResponse, id: string) => {
-      const result = await service.delete(id);
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify(result));
-    },
+export const userController =
+  (service: UserService) =>
+  async (
+    method: string | undefined,
+    url: string | undefined,
+    res: ServerResponse<IncomingMessage>,
+    body?: any,
+  ) => {
+    const parsedUrl = url?.match(URL_MATCHER);
+    const userId = parsedUrl && parsedUrl[1];
+    const errorHandlerChain = createChain(handle404Request, handle400Request);
+
+
+    {
+      if (method === HttpMethod.GET && userId) {
+        const result = await service.getById(userId).catch((error) => {
+          errorHandlerChain(error, res, `${userId}`, null);
+        });
+      }
+
+      if (method === HttpMethod.POST && body) {
+        const result = await service.create(body).catch((error) => {
+          errorHandlerChain(error, res, `${userId}`, null);
+        });
+      }
+
+      if (method === HttpMethod.PUT && userId) {
+        const result = await service.update(userId, body).catch((error) => {
+          errorHandlerChain(error, res, `${userId}`, null);
+        });
+      }
+
+      if (method === HttpMethod.DELETE && userId) {
+        const result = await service.delete(userId).catch((error) => {
+          errorHandlerChain(error, res, `${userId}`, null);
+        });
+
+        if(result){
+          res.writeHead(204, { 'Content-Type': 'application/json' });
+          res.end();
+        }
+      }
+    }
   };
-};
-
-

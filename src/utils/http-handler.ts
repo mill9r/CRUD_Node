@@ -6,7 +6,7 @@ const handleHttpRequest = (
   callback: (
     method: string | undefined,
     url: string | undefined,
-    res?: ServerResponse,
+    res: ServerResponse,
     body?: string,
   ) => void,
 ) => {
@@ -15,7 +15,7 @@ const handleHttpRequest = (
     body += chunk.toString();
   });
   req.on('end', () => {
-    callback(req.method, req.url, res, JSON.parse(body));
+    callback(req.method, req.url, res, body && JSON.parse(body));
   });
 };
 

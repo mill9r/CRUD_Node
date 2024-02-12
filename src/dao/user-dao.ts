@@ -15,7 +15,7 @@ export const userDao = (): UserDao => {
     },
     create: async (user: User) => {
       const id = uuidv4();
-      users.set(uuidv4(), {
+      users.set(id, {
         id,
         ...user,
       });

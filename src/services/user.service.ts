@@ -27,14 +27,17 @@ export const userService = (deps: UserDao): UserService => {
       isIdValid(id);
       if (user.username) {
         isUserNameValid(user);
+        return deps.update(id, user);
       }
       if (user.age) {
         isUserAgeValid(user);
+        return deps.update(id, user);
       }
       if (user.hobbies) {
         isUserHobbiesValid(user);
+        return deps.update(id, user);
       }
-      return deps.update(id, user);
+      return deps.getById(id);
     },
     delete: async (id: string) => {
       isIdValid(id);
