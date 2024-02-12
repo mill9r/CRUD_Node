@@ -9,7 +9,7 @@ interface Read<T> {
 }
 
 interface Update<T> {
-  update: (id: string, user: T) => Promise<void>;
+  update: (id: string, user: T) => Promise<T>;
 }
 
 interface Delete {

@@ -136,3 +136,7 @@ dist
 /workspace.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/codeStyles/Project.xml
+/.idea/prettier.xml
+/.idea/workspace.xml

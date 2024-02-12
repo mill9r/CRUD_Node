@@ -1,7 +1,7 @@
 import { User } from '../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
-import { DaoNotExistError } from '../exceptions/dao-exceptions';
 import { UserDao } from './user-dao.interface';
+import { isUserExist } from './user-dao.validators';
 
 export const userDao = (): UserDao => {
   const users = new Map<string, User>();
@@ -10,7 +10,7 @@ export const userDao = (): UserDao => {
       return Array.from(users.values()) as User[];
     },
     getById: async (id: string) => {
-      isUserNotExist(id, users);
+      isUserExist(id, users);
       return users.get(id) as User;
     },
     create: async (user: User) => {
@@ -22,19 +22,14 @@ export const userDao = (): UserDao => {
       return users.get(id) as User;
     },
     update: async (id: string, user: User) => {
-      isUserNotExist(id, users);
-
-      users.set(id, { ...users.get(id), ...user });
+      isUserExist(id, users);
+      const updatedUser = { ...users.get(id), ...user };
+      users.set(id, updatedUser);
+      return updatedUser;
     },
     delete: async (id: string) => {
-      isUserNotExist(id, users);
+      isUserExist(id, users);
       return users.delete(id);
     },
   };
-};
-
-const isUserNotExist = (id: string, users: Map<string, User>) => {
-  if (!users.has(id)) {
-    throw new DaoNotExistError();
-  }
 };
